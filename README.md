@@ -1,14 +1,15 @@
-# dsh-zh-reasoning
+# dsh-zh-reasoning-fixed
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ZiYe4u/dsh-zh-reasoning?style=social)](https://github.com/ZiYe4u/dsh-zh-reasoning)
+[![GitHub stars](https://img.shields.io/github/stars/ZiYe4u/dsh-zh-reasoning-fixed?style=social)](https://github.com/ZiYe4u/dsh-zh-reasoning-fixed)
 
 让 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的**思考（reasoning）与最终回答**默认使用简体中文的插件。
 
 > **本仓库是 [zhy201810576/dsh-zh-reasoning](https://github.com/zhy201810576/dsh-zh-reasoning) 的非官方衍生版本（unofficial fork）**，
 > 与原作者之间不存在隶属、赞助或背书关系；后者又是基于
 > [imlishiyuan/deepseek-harness-zh-cn](https://github.com/imlishiyuan/deepseek-harness-zh-cn)（Apache-2.0）改写而来。
-> 本仓库在其基础上修复了 DSH 会话格式 v4 的 source 署名问题，并改为零运行时依赖。
+> 本仓库在其基础上修复了 DSH 会话格式 v4 的 source 署名问题，改为零运行时依赖，
+> 并把仓库名与包名都改为 `dsh-zh-reasoning-fixed`，以免与上游同名造成混淆。
 > 版权与归属详见文末「版权与归属」一节。
 
 ## 功能特性
@@ -39,7 +40,7 @@ DSH 的会话格式 v4 要求每条消息的来源由生产方署名：`source.k
 且不能是已废弃的 `"plugin"` 包装。因此本插件注入的消息使用：
 
 ```js
-source: { kind: 'dsh-zh-reasoning', form: 'snapshot', sections: [{ name, text }] }
+source: { kind: 'dsh-zh-reasoning-fixed', form: 'snapshot', sections: [{ name, text }] }
 ```
 
 这与官方 `@deepseek-ai/dsh-time-context` 的做法一致。若使用旧写法（`kind: 'plugin'`），
@@ -57,36 +58,40 @@ format v4 message requires a producer-owned source kind
 **方式一：从 GitHub 直接安装（推荐）**
 
 ```sh
-dsh plugin --profile <name> add "dsh-zh-reasoning@git+https://github.com/ZiYe4u/dsh-zh-reasoning.git"
+dsh plugin --profile <name> add "dsh-zh-reasoning-fixed@git+https://github.com/ZiYe4u/dsh-zh-reasoning-fixed.git"
 ```
 
 > [!IMPORTANT]
-> npm 上的 `dsh-zh-reasoning` 是**上游作者发布的包**（maintainer 为 `graychao`），与本仓库无关。
-> 执行 `dsh plugin --profile <name> add dsh-zh-reasoning` 装到的是那个上游版本，而不是本仓库的代码；
-> 本仓库也不使用该包名发布到 npm，请务必用上面带 `git+` 的写法。
+> 本仓库的包名是 `dsh-zh-reasoning-fixed`（与仓库名一致），未发布到 npm。
+> 而 npm 上的 `dsh-zh-reasoning` 是**上游作者发布的包**（maintainer 为 `graychao`），
+> 与本仓库无关——执行 `dsh plugin --profile <name> add dsh-zh-reasoning` 装到的是那个上游版本。
 
 **方式二：本地开发（`file:` 依赖）** 在 profile 的 `package.json` 中添加依赖并加入 bundles：
 
 ```json
 {
-  "dependencies": { "dsh-zh-reasoning": "file:../dsh-zh-reasoning" },
-  "dsh": { "profile": { "bundles": [ "...", "dsh-zh-reasoning" ] } }
+  "dependencies": { "dsh-zh-reasoning-fixed": "file:../dsh-zh-reasoning-fixed" },
+  "dsh": { "profile": { "bundles": [ "...", "dsh-zh-reasoning-fixed" ] } }
 }
 ```
 
 然后在该 profile 目录执行 `pnpm install` 并重启 `dsh web`。
 
-**方式三：直接本地挂载（无需安装）** 把本仓库目录拷贝到 `~/.dsh/profiles/<name>/node_modules/dsh-zh-reasoning`，
+**方式三：直接本地挂载（无需安装）** 把本仓库目录拷贝到
+`~/.dsh/profiles/<name>/node_modules/dsh-zh-reasoning-fixed`，
 再在 `~/.dsh/profiles/<name>/cordis.patch.yml` 中补上挂载行：
 
 ```yaml
 - insert:
     - id: dsh-zh
-      name: dsh-zh-reasoning
+      name: dsh-zh-reasoning-fixed
 ```
 
 放在 profile 的 `node_modules` 下时，Node 会沿目录链向上解析到 DSH 自带的
 `@deepseek-ai/dsh-llm`，因此不需要额外安装依赖。
+
+> 从上游版本迁移过来时，记得把 profile 里的挂载行 `name:` 从 `dsh-zh-reasoning`
+> 改成 `dsh-zh-reasoning-fixed`，否则 DSH 会找不到该包。
 
 ## 验证
 
@@ -97,12 +102,12 @@ dsh --profile <name> --dump-config | findstr dsh-zh
 看到 `dsh-zh` 行即表示已挂载。之后新建会话，模型应以简体中文思考与回答。
 
 想确认注入真的落盘，可以查看会话日志（`~/.dsh/sessions/<项目>/<session>/session.v4.jsonl.zstd`），
-其中应出现 `"source":{"kind":"dsh-zh-reasoning",...}` 的 user 消息。
+其中应出现 `"source":{"kind":"dsh-zh-reasoning-fixed",...}` 的 user 消息。
 
 ## 目录结构
 
 ```
-dsh-zh-reasoning/
+dsh-zh-reasoning-fixed/
 ├── lib/
 │   └── index.js        # 插件入口：pre-step 注入中文 system-reminder（梁神模式下改追加 persona）
 ├── cordis.patch.yml    # bundle 补丁层：声明插件挂载行
@@ -119,7 +124,7 @@ dsh-zh-reasoning/
 本插件不携带依赖，直接挂进 profile 即可调试：
 
 ```sh
-node -e "import('file:///绝对路径/dsh-zh-reasoning/lib/index.js').then(m=>console.log(m.name))"
+node -e "import('file:///绝对路径/dsh-zh-reasoning-fixed/lib/index.js').then(m=>console.log(m.name))"
 ```
 
 该命令在 profile 的 `node_modules` 目录树内执行时才能解析到 `@deepseek-ai/dsh-llm`；
@@ -134,14 +139,14 @@ node -e "import('file:///绝对路径/dsh-zh-reasoning/lib/index.js').then(m=>co
 |---|---|---|---|
 | 上游 | [zhy201810576/dsh-zh-reasoning](https://github.com/zhy201810576/dsh-zh-reasoning) | Copyright 2026 zhy201810576 | Apache-2.0 |
 | 更上游 | [imlishiyuan/deepseek-harness-zh-cn](https://github.com/imlishiyuan/deepseek-harness-zh-cn) | Copyright (c) imlishiyuan | Apache-2.0 |
-| 本仓库的修改 | [ZiYe4u/dsh-zh-reasoning](https://github.com/ZiYe4u/dsh-zh-reasoning) | Copyright 2026 ZiYe4u | Apache-2.0 |
+| 本仓库的修改 | [ZiYe4u/dsh-zh-reasoning-fixed](https://github.com/ZiYe4u/dsh-zh-reasoning-fixed) | Copyright 2026 ZiYe4u | Apache-2.0 |
 
 - `LICENSE` 为上游原文件，**未做任何修改**，其中完整保留了两级上游的版权声明（Apache-2.0 §4(a) / §4(c)）。
 - 被修改的源文件（`lib/index.js`）在文件头标注了修改者、修改日期与改动摘要（Apache-2.0 §4(b)）；
   新增与改写的文档（`README.md`、`CHANGELOG.md`、`.gitignore`、`.gitattributes`）在本节统一声明归属。
 - 上游与本仓库均**不含 `NOTICE` 文件**，因此不涉及 Apache-2.0 §4(d) 的额外归属展示义务。
 - Apache-2.0 §6 不授予商标许可：请勿使用上游作者的名义进行宣传，或暗示其对本项目的背书。
-- 本仓库与上游同名，仅表示代码同源，不代表同一项目；如需可辨识度，建议在引用时注明本仓库地址。
+- 本仓库与上游代码同源但已是独立项目（仓库名、包名均已区分），引用时请注明本仓库地址。
 
 ## 协议
 

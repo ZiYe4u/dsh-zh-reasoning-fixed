@@ -18,6 +18,9 @@
   由 DSH 宿主提供；仓库不再需要 `node_modules`，可直接克隆使用。
 - `package.json` 补充 `exports` / `engines` / `repository` / `homepage` / `bugs` 字段。
 - 包版本号由 `0.1.1` 调整为 `1.1.1`，与 npm 上 `1.1.0` 的版本线对齐。
+- 仓库更名为 `ZiYe4u/dsh-zh-reasoning-fixed`，插件包名与注册名同步改为
+  `dsh-zh-reasoning-fixed`（`source.kind` 随之变化），以避免与上游
+  `zhy201810576/dsh-zh-reasoning` 及 npm 上的同名包混淆。
 
 ### 文档
 
